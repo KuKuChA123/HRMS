@@ -1,0 +1,1289 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HR Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #4B3F72;
+      --primary-light: #6B5CA5;
+      --primary-dark: #3A3159;
+      --secondary: #BFA2DB;
+      --light: #F7EDF0;
+      --white: #FFFFFF;
+      --error: #FF6B6B;
+      --success: #4BB543;
+      --text: #2D2A4A;
+      --text-light: #A0A0B2;
+      --gray: #E5E5E5;
+      --border-radius: 10px;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --shadow-hover: 0 6px 16px rgba(0, 0, 0, 0.12);
+      --transition: all 0.25s ease;
+      --focus-ring: 0 0 0 3px rgba(191, 162, 219, 0.5);
+      --sidebar-width: 280px;
+      --sidebar-collapsed: 80px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    body {
+      background-color: var(--light);
+      color: var(--text);
+      line-height: 1.5;
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      width: var(--sidebar-width);
+      background-color: var(--white);
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+      z-index: 100;
+      overflow-y: auto;
+    }
+
+    .sidebar.collapsed {
+      width: var(--sidebar-collapsed);
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 20px;
+      border-bottom: 1px solid var(--gray);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 24px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .logo-icon {
+      font-size: 28px;
+      color: var(--primary);
+    }
+
+    .toggle-btn {
+      background: none;
+      border: none;
+      color: var(--text-light);
+      font-size: 18px;
+      cursor: pointer;
+      transition: var(--transition);
+      padding: 4px;
+      border-radius: 50%;
+    }
+
+    .toggle-btn:hover {
+      color: var(--primary);
+      background-color: var(--light);
+    }
+
+    .sidebar-menu {
+      padding: 20px 0;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 20px;
+      color: var(--text-light);
+      text-decoration: none;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .menu-item:hover, .menu-item.active {
+      color: var(--primary);
+      background-color: var(--light);
+    }
+
+    .menu-item i {
+      font-size: 18px;
+      margin-right: 16px;
+      width: 24px;
+      text-align: center;
+    }
+
+    .menu-text {
+      transition: opacity 0.2s ease;
+    }
+
+    .sidebar.collapsed .menu-text {
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
+    }
+
+    /* Main Content Styles */
+    .main-content {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      transition: var(--transition);
+      padding: 24px;
+    }
+
+    .sidebar.collapsed ~ .main-content {
+      margin-left: var(--sidebar-collapsed);
+    }
+
+    /* Header Styles */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .header-title h1 {
+      font-size: 24px;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .header-title p {
+      color: var(--text-light);
+      font-size: 14px;
+    }
+
+    .header-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .current-time {
+
+
+background-color: var(--white);
+      padding: 8px 16px;
+      border-radius: var(--border-radius);
+      font-weight: 500;
+      box-shadow: var(--shadow);
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      font-weight: 600;
+    }
+
+    /* Dashboard Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 20px;
+    }
+
+    /* Announcement Banner */
+    .announcement-banner {
+      grid-column: span 12;
+      background-color: var(--white);
+      border-radius: var(--border-radius);
+      padding: 16px 24px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .announcement-content {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .announcement-icon {
+      font-size: 24px;
+      color: var(--primary);
+    }
+
+    .announcement-text {
+      flex: 1;
+    }
+
+    .announcement-text p {
+      color: var(--text-light);
+      font-size: 14px;
+    }
+
+    .announcement-text h3 {
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+
+    /* Stats Cards */
+    .stats-card {
+      grid-column: span 3;
+      background-color: var(--white);
+      border-radius: var(--border-radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+
+    .stats-card:hover {
+      box-shadow: var(--shadow-hover);
+    }
+
+    .stats-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .stats-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      font-size: 18px;
+    }
+
+    .stats-icon.payroll {
+      background-color: var(--primary);
+    }
+
+    .stats-icon.employees {
+      background-color: var(--success);
+    }
+
+    .stats-icon.days {
+      background-color: var(--secondary);
+    }
+
+    .stats-icon.processed {
+      background-color: #FF9F43;
+    }
+
+    .stats-title {
+      font-size: 14px;
+      color: var(--text-light);
+    }
+
+    .stats-value {
+      font-size: 24px;
+      font-weight: 600;
+      margin: 8px 0;
+    }
+
+    .stats-change {
+      font-size: 12px;
+      color: var(--success);
+      display: flex;
+      align-items: center;
+    }
+
+    .stats-change.negative {
+      color: var(--error);
+    }
+
+    /* Calendar Section */
+    .calendar-section {
+      grid-column: span 4;
+      background-color: var(--white);
+      border-radius: var(--border-radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .calendar-nav {
+      display: flex;
+      gap: 8px;
+    }
+
+    .calendar-nav-btn {
+      background: none;
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-light);
+      transition: var(--transition);
+    }
+
+    .calendar-nav-btn:hover {
+      background-color: var(--light);
+      color: var(--primary);
+    }
+
+    .calendar-month {
+      font-weight: 500;
+    }
+
+    .calendar-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      margin-bottom: 12px;
+      font-size: 12px;
+      color: var(--text-light);
+    }
+
+    .calendar-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+
+
+gap: 8px;
+    }
+
+    .calendar-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 14px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .calendar-day:hover {
+      background-color: var(--light);
+    }
+
+    .calendar-day.today {
+      background-color: var(--primary);
+      color: var(--white);
+      font-weight: 600;
+    }
+
+    .calendar-day.other-month {
+      color: var(--text-light);
+      opacity: 0.5;
+    }
+
+    .time-details {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--gray);
+    }
+
+    .time-detail {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .time-label {
+      color: var(--text-light);
+    }
+
+    .time-value {
+      font-weight: 500;
+    }
+
+    /* Time Off Section */
+    .timeoff-section {
+      grid-column: span 4;
+      background-color: var(--white);
+      border-radius: var(--border-radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .timeoff-progress {
+      margin-bottom: 20px;
+    }
+
+    .timeoff-type {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .timeoff-name {
+      font-weight: 500;
+    }
+
+    .timeoff-days {
+      color: var(--text-light);
+    }
+
+    .progress-bar {
+      height: 6px;
+      background-color: var(--gray);
+      border-radius: 3px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background-color: var(--primary);
+      border-radius: 3px;
+      width: 60%;
+    }
+
+    .timeoff-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 10px 16px;
+      border-radius: var(--border-radius);
+      border: none;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: var(--white);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-light);
+      box-shadow: 0 6px 12px rgba(75, 63, 114, 0.2);
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--light);
+    }
+
+    /* Interviews Section */
+    .interviews-section {
+      grid-column: span 4;
+      background-color: var(--white);
+      border-radius: var(--border-radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--gray);
+      margin-bottom: 16px;
+    }
+
+    .tab {
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--text-light);
+      position: relative;
+    }
+
+    .tab.active {
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: var(--primary);
+    }
+
+    .interview-list {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .interview-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--gray);
+    }
+
+    .interview-item:last-child {
+      border-bottom: none;
+    }
+
+    .interview-time {
+      font-size: 12px;
+      color: var(--text-light);
+      width: 80px;
+    }
+
+    .interview-details {
+      flex: 1;
+    }
+
+    .interview-name {
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .interview-position {
+      font-size: 12px;
+      color: var(--text-light);
+    }
+
+    .interview-status {
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      background-color: var(--light);
+      color: var(--primary);
+    }
+
+    /* Modal Styles */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+
+
+width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition);
+    }
+
+    .modal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-content {
+      background-color: var(--white);
+      border-radius: var(--border-radius);
+      width: 100%;
+      max-width: 500px;
+      padding: 24px;
+      box-shadow: var(--shadow-hover);
+      transform: translateY(20px);
+      transition: var(--transition);
+    }
+
+    .modal.active .modal-content {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: var(--text-light);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .modal-close:hover {
+      color: var(--primary);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--gray);
+      border-radius: var(--border-radius);
+      font-size: 14px;
+      transition: var(--transition);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--secondary);
+      box-shadow: var(--focus-ring);
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 1200px) {
+      .stats-card {
+        grid-column: span 6;
+      }
+      
+      .calendar-section,
+      .timeoff-section,
+      .interviews-section {
+        grid-column: span 6;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      
+      .main-content {
+        margin-left: 0;
+      }
+      
+      .stats-card,
+      .calendar-section,
+      .timeoff-section,
+      .interviews-section {
+        grid-column: span 12;
+      }
+      
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+      
+      .header-info {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <i class="fas fa-users logo-icon"></i>
+        <h1 class="logo-text">HRPro</h1>
+      </div>
+      <button class="toggle-btn" id="sidebarToggle">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+    </div>
+    <nav class="sidebar-menu">
+      <a href="#" class="menu-item active">
+        <i class="fas fa-home"></i>
+        <span class="menu-text">Home</span>
+      </a>
+
+
+</a>
+      <a href="#" class="menu-item">
+        <i class="fas fa-user"></i>
+        <span class="menu-text">Personal</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fas fa-clock"></i>
+        <span class="menu-text">Timesheet</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fas fa-calendar-minus"></i>
+        <span class="menu-text">Time Off</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fas fa-bell"></i>
+        <span class="menu-text">Emergency</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fas fa-chart-line"></i>
+        <span class="menu-text">Performance</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fas fa-briefcase"></i>
+        <span class="menu-text">Professional Path</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fas fa-inbox"></i>
+        <span class="menu-text">Inbox</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-title">
+        <h1>HR Dashboard</h1>
+        <p>Welcome back to your workspace</p>
+      </div>
+      <div class="header-info">
+        <div class="current-time" id="currentTime">
+          <!-- Time will be inserted by JavaScript -->
+        </div>
+        <div class="user-profile">
+          <div class="user-avatar">BK</div>
+          <span>Bartie Klein – HR</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Dashboard Grid -->
+    <div class="dashboard-grid">
+      <!-- Announcement Banner -->
+      <section class="announcement-banner">
+        <div class="announcement-content">
+          <i class="fas fa-bullhorn announcement-icon"></i>
+          <div class="announcement-text">
+            <h3>Today's Announcements</h3>
+            <p>🎂 Happy Birthday to Sarah Johnson! • ⏰ Payroll cut-off is tomorrow at 5 PM • 🌴 3 employees on leave today</p>
+          </div>
+          <i class="fas fa-chevron-right"></i>
+        </div>
+      </section>
+
+      <!-- Stats Cards -->
+      <section class="stats-card">
+        <div class="stats-header">
+          <span class="stats-title">Payroll</span>
+          <div class="stats-icon payroll">
+            <i class="fas fa-money-bill-wave"></i>
+          </div>
+        </div>
+        <div class="stats-value">15 days</div>
+        <div class="stats-change">
+          <i class="fas fa-arrow-up"></i> 2 days left
+        </div>
+      </section>
+
+      <section class="stats-card">
+        <div class="stats-header">
+          <span class="stats-title">Total Employees</span>
+          <div class="stats-icon employees">
+            <i class="fas fa-users"></i>
+          </div>
+        </div>
+        <div class="stats-value">130 <span style="font-size: 16px; color: var(--success);">+2</span></div>
+        <div class="stats-change">
+          <i class="fas fa-arrow-up"></i> 2 new hires
+        </div>
+      </section>
+
+      <section class="stats-card">
+        <div class="stats-header">
+          <span class="stats-title">Working Days</span>
+          <div class="stats-icon days">
+            <i class="fas fa-calendar-alt"></i>
+          </div>
+        </div>
+        <div class="stats-value">11 days</div>
+        <div class="stats-change negative">
+          <i class="fas fa-arrow-down"></i> 1 holiday
+        </div>
+      </section>
+
+      <section class="stats-card">
+        <div class="stats-header">
+          <span class="stats-title">Payroll Processed</span>
+          <div class="stats-icon processed">
+            <i class="fas fa-check-circle"></i>
+          </div>
+        </div>
+        <div class="stats-value">121/130</div>
+        <div class="stats-change">
+          <i class="fas fa-arrow-up"></i> 93% complete
+        </div>
+      </section>
+
+      <!-- Calendar Section -->
+      <section class="calendar-section">
+        <div class="section-header">
+          <h2 class="section-title">Calendar</h2>
+          <button class="btn btn-outline">
+
+
+<i class="fas fa-plus"></i> Add Event
+          </button>
+        </div>
+        
+        <div class="calendar-header">
+          <div class="calendar-nav">
+            <button class="calendar-nav-btn">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="calendar-nav-btn">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+          <div class="calendar-month">June 2023</div>
+        </div>
+        
+        <div class="calendar-weekdays">
+          <div>S</div>
+          <div>M</div>
+          <div>T</div>
+          <div>W</div>
+          <div>T</div>
+          <div>F</div>
+          <div>S</div>
+        </div>
+        
+        <div class="calendar-days" id="calendarDays">
+          <!-- Calendar days will be inserted by JavaScript -->
+        </div>
+        
+        <div class="time-details">
+          <div class="time-detail">
+            <span class="time-label">Start Time</span>
+            <span class="time-value">9:00 AM</span>
+          </div>
+          <div class="time-detail">
+            <span class="time-label">End Time</span>
+            <span class="time-value">6:00 PM</span>
+          </div>
+          <div class="time-detail">
+            <span class="time-label">Break Time</span>
+            <span class="time-value">60 min</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Time Off Section -->
+      <section class="timeoff-section">
+        <div class="section-header">
+          <h2 class="section-title">Time Off</h2>
+        </div>
+        
+        <div class="timeoff-progress">
+          <div class="timeoff-type">
+            <span class="timeoff-name">Vacation</span>
+            <span class="timeoff-days">8 days YTD</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 40%;"></div>
+          </div>
+          
+          <div class="timeoff-type">
+            <span class="timeoff-name">Sick Leave</span>
+            <span class="timeoff-days">3 days YTD</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 15%;"></div>
+          </div>
+          
+          <div class="timeoff-type">
+            <span class="timeoff-name">Personal Days</span>
+            <span class="timeoff-days">2 days YTD</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 20%;"></div>
+          </div>
+        </div>
+        
+        <div class="timeoff-actions">
+          <button class="btn btn-primary" id="requestTimeOffBtn">
+            <i class="fas fa-paper-plane"></i> Request Time Off
+          </button>
+          <button class="btn btn-outline" id="approveTimeOffBtn">
+            <i class="fas fa-check"></i> Approve Time Off
+          </button>
+        </div>
+      </section>
+
+      <!-- Interviews Section -->
+      <section class="interviews-section">
+        <div class="section-header">
+          <h2 class="section-title">Interviews</h2>
+        </div>
+        
+        <div class="tabs">
+          <div class="tab active">Today</div>
+          <div class="tab">Upcoming</div>
+          <div class="tab">Completed</div>
+        </div>
+        
+        <div class="interview-list">
+          <div class="interview-item">
+            <div class="interview-time">10:00 AM</div>
+            <div class="interview-details">
+              <div class="interview-name">Michael Chen</div>
+              <div class="interview-position">Senior Developer</div>
+            </div>
+            <div class="interview-status">Scheduled</div>
+          </div>
+          
+          <div class="interview-item">
+            <div class="interview-time">1:30 PM</div>
+            <div class="interview-details">
+              <div class="interview-name">Jessica Williams</div>
+              <div class="interview-position">HR Specialist</div>
+            </div>
+            <div class="interview-status">Confirmed</div>
+          </div>
+
+
+<div class="interview-item">
+            <div class="interview-time">3:45 PM</div>
+            <div class="interview-details">
+              <div class="interview-name">David Rodriguez</div>
+              <div class="interview-position">Marketing Manager</div>
+            </div>
+            <div class="interview-status">Pending</div>
+          </div>
+          
+          <div class="interview-item">
+            <div class="interview-time">4:30 PM</div>
+            <div class="interview-details">
+              <div class="interview-name">Emily Parker</div>
+              <div class="interview-position">UX Designer</div>
+            </div>
+            <div class="interview-status">Rescheduled</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Time Off Request Modal -->
+  <div class="modal" id="timeOffRequestModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Request Time Off</h3>
+        <button class="modal-close" id="closeRequestModal">&times;</button>
+      </div>
+      <form id="timeOffRequestForm">
+        <div class="form-group">
+          <label for="leaveType">Leave Type</label>
+          <select class="form-control" id="leaveType" required>
+            <option value="">Select leave type</option>
+            <option value="vacation">Vacation</option>
+            <option value="sick">Sick Leave</option>
+            <option value="personal">Personal Day</option>
+            <option value="bereavement">Bereavement</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="startDate">Start Date</label>
+          <input type="date" class="form-control" id="startDate" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="endDate">End Date</label>
+          <input type="date" class="form-control" id="endDate" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="notes">Notes</label>
+          <textarea class="form-control" id="notes" rows="3"></textarea>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" id="cancelRequest">Cancel</button>
+          <button type="submit" class="btn btn-primary">Submit Request</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Time Off Approval Modal -->
+  <div class="modal" id="timeOffApproveModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Approve Time Off Requests</h3>
+        <button class="modal-close" id="closeApproveModal">&times;</button>
+      </div>
+      
+      <div class="form-group">
+        <label>Pending Requests</label>
+        <div class="pending-requests">
+          <div class="request-item">
+            <div class="request-header">
+              <span class="request-name">John Smith</span>
+              <span class="request-days">3 days</span>
+            </div>
+            <div class="request-dates">Jun 15 - Jun 17, 2023</div>
+            <div class="request-type">Vacation</div>
+            <div class="request-actions">
+              <button class="btn btn-outline btn-sm">View Details</button>
+              <div class="approve-reject">
+                <button class="btn btn-success btn-sm">Approve</button>
+                <button class="btn btn-error btn-sm">Reject</button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="request-item">
+            <div class="request-header">
+              <span class="request-name">Sarah Johnson</span>
+              <span class="request-days">1 day</span>
+            </div>
+            <div class="request-dates">Jun 20, 2023</div>
+            <div class="request-type">Sick Leave</div>
+            <div class="request-actions">
+              <button class="btn btn-outline btn-sm">View Details</button>
+              <div class="approve-reject">
+
+<button class="btn btn-success btn-sm">Approve</button>
+                <button class="btn btn-error btn-sm">Reject</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="cancelApprove">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Sidebar Toggle
+    const sidebar = document.querySelector('.sidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const mainContent = document.querySelector('.main-content');
+    
+    sidebarToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+      sidebarToggle.querySelector('i').classList.toggle('fa-chevron-left');
+      sidebarToggle.querySelector('i').classList.toggle('fa-chevron-right');
+    });
+
+    // Mobile sidebar toggle
+    function handleMobileView() {
+      if (window.innerWidth <= 768) {
+        sidebar.classList.add('collapsed');
+        sidebar.style.transform = 'translateX(-100%)';
+      } else {
+        sidebar.style.transform = 'translateX(0)';
+      }
+    }
+
+    window.addEventListener('resize', handleMobileView);
+    handleMobileView();
+
+    // Update current time
+    function updateTime() {
+      const now = new Date();
+      const options = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      };
+      document.getElementById('currentTime').textContent = now.toLocaleDateString('en-US', options);
+    }
+
+    updateTime();
+    setInterval(updateTime, 60000); // Update every minute
+
+    // Generate calendar days
+    function generateCalendar() {
+      const calendarDays = document.getElementById('calendarDays');
+      const date = new Date();
+      const year = date.getFullYear();
+      const month = date.getMonth();
+      
+      // Get first day of month and total days in month
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      
+      // Get days from previous month
+      const daysInPrevMonth = new Date(year, month, 0).getDate();
+      
+      // Clear calendar
+      calendarDays.innerHTML = '';
+      
+      // Previous month days
+      for (let i = firstDay - 1; i >= 0; i--) {
+        const dayElement = document.createElement('div');
+        dayElement.classList.add('calendar-day', 'other-month');
+        dayElement.textContent = daysInPrevMonth - i;
+        calendarDays.appendChild(dayElement);
+      }
+      
+      // Current month days
+      const today = new Date();
+      for (let i = 1; i <= daysInMonth; i++) {
+        const dayElement = document.createElement('div');
+        dayElement.classList.add('calendar-day');
+        if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+          dayElement.classList.add('today');
+        }
+        dayElement.textContent = i;
+        calendarDays.appendChild(dayElement);
+      }
+      
+      // Next month days
+      const totalCells = firstDay + daysInMonth;
+      const remainingCells = totalCells > 35 ? 42 - totalCells : 35 - totalCells;
+      
+      for (let i = 1; i <= remainingCells; i++) {
+        const dayElement = document.createElement('div');
+        dayElement.classList.add('calendar-day', 'other-month');
+        dayElement.textContent = i;
+        calendarDays.appendChild(dayElement);
+      }
+    }
+
+    generateCalendar();
+
+    // Modal Handling
+    const requestModal = document.getElementById('timeOffRequestModal');
+    const approveModal = document.getElementById('timeOffApproveModal');
+    const requestBtn = document.getElementById('requestTimeOffBtn');
+    const approveBtn = document.getElementById('approveTimeOffBtn');
+    const closeRequest = document.getElementById('closeRequestModal');
+    const closeApprove = document.getElementById('closeApproveModal');
+    const cancelRequest = document.getElementById('cancelRequest');
+    const cancelApprove = document.
+
+getElementById('cancelApprove');
+
+    requestBtn.addEventListener('click', () => {
+      requestModal.classList.add('active');
+    });
+
+    approveBtn.addEventListener('click', () => {
+      approveModal.classList.add('active');
+    });
+
+    closeRequest.addEventListener('click', () => {
+      requestModal.classList.remove('active');
+    });
+
+    closeApprove.addEventListener('click', () => {
+      approveModal.classList.remove('active');
+    });
+
+    cancelRequest.addEventListener('click', () => {
+      requestModal.classList.remove('active');
+    });
+
+    cancelApprove.addEventListener('click', () => {
+      approveModal.classList.remove('active');
+    });
+
+    // Close modal when clicking outside
+    window.addEventListener('click', (e) => {
+      if (e.target === requestModal) {
+        requestModal.classList.remove('active');
+      }
+      if (e.target === approveModal) {
+        approveModal.classList.remove('active');
+      }
+    });
+
+    // Form submission
+    document.getElementById('timeOffRequestForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      // Here you would typically send the data to a server
+      alert('Time off request submitted successfully!');
+      requestModal.classList.remove('active');
+      // Reset form
+      e.target.reset();
+    });
+  </script>
+</body>
+</html>
+
